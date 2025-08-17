@@ -8,25 +8,35 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: [
-      { find: '@', replacement: path.resolve(import.meta.dirname, 'src') },
-      { find: '@shared', replacement: path.resolve(import.meta.dirname, 'shared') },
-      { find: '@assets', replacement: path.resolve(import.meta.dirname, 'attached_assets') },
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@shared', replacement: path.resolve(__dirname, 'shared') },
+      { find: '@assets', replacement: path.resolve(__dirname, 'public/assets') },
     ],
   },
-  root: path.resolve(import.meta.dirname, "."),
+  root: path.resolve(__dirname, "."),
   base: '/',
+  publicDir: 'public',
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
     assetsDir: 'assets',
     copyPublicDir: true,
     chunkSizeWarningLimit: 1000,
+    sourcemap: mode === 'development',
+    minify: mode === 'production' ? 'terser' : false,
+    cssMinify: mode === 'production',
+    reportCompressedSize: false,
     rollupOptions: {
-      input: path.resolve(import.meta.dirname, "index.html"),
+      input: path.resolve(__dirname, "index.html"),
       output: {
         manualChunks: {
-          react: ['react', 'react-dom'],
-          vendor: ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-select'],
+          react: ['react', 'react-dom', 'react-router-dom'],
+          vendor: [
+            '@radix-ui/react-slot', 
+            '@radix-ui/react-dialog', 
+            '@radix-ui/react-select',
+            '@radix-ui/themes'
+          ],
           animation: ['framer-motion'],
           query: ['@tanstack/react-query'],
           icons: ['lucide-react'],
@@ -38,7 +48,7 @@ export default defineConfig(({ mode }) => ({
           const ext = info[info.length - 1];
           
           if (['png', 'jpe?g', 'gif', 'svg', 'webp', 'avif'].includes(ext)) {
-            return `images/[name][extname]`;
+            return `assets/images/[name]-[hash][extname]`;
           }
           
           if (ext === 'css') {
