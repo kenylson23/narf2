@@ -4,9 +4,9 @@
   base = "/"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18.18.2"
   NPM_FLAGS = "--legacy-peer-deps"
-  NPM_VERSION = "10.5.0"
+  NPM_VERSION = "9.8.1"
   YARN_VERSION = "1.22.22"
   YARN_FLAGS = "--ignore-engines"
 
