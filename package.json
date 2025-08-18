@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "build:netlify": "run-s build:app generate-sitemap copy-public-files",
+    "build:netlify": "npx run-s build:app generate-sitemap copy-public-files",
     "build:app": "vite build --config vite.config.static.ts",
     "preview": "vite preview --port 3000",
     "start": "vite preview --port 3000",
