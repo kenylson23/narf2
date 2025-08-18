@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
-import { SitemapStream } from 'sitemap';
+import { SitemapStream, streamToPromise } from 'sitemap';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -20,12 +20,27 @@ const links = [
 // Função para gerar o sitemap
 async function generateSitemap() {
   try {
+    console.log('Iniciando geração do sitemap...');
+    
+    // Configuração do sitemap
+    const sitemapOptions = { 
+      hostname: 'https://colegionarfive.ao',
+      lastmodDateOnly: false,
+      xmlns: {
+        news: false,
+        xhtml: true,
+        image: false,
+        video: false
+      }
+    };
+    
     // Cria o stream do sitemap
-    const stream = new SitemapStream({ hostname: 'https://colegionarfive.ao' });
+    const stream = new SitemapStream(sitemapOptions);
     
     // Cria o diretório de saída se não existir
     const outDir = resolve(__dirname, '../dist');
     if (!existsSync(outDir)) {
+      console.log(`Criando diretório de saída: ${outDir}`);
       mkdirSync(outDir, { recursive: true });
     }
     
@@ -35,17 +50,18 @@ async function generateSitemap() {
     // Pipe para o SitemapStream
     const pipeline = readable.pipe(stream);
     
-    // Coleta os dados do stream
-    let data = '';
-    for await (const chunk of stream) {
-      data += chunk;
-    }
+    // Gera o sitemap
+    const sitemap = await streamToPromise(pipeline);
     
     // Escreve o sitemap no arquivo
-    writeFileSync(join(outDir, 'sitemap.xml'), data);
-    console.log('Sitemap gerado com sucesso!');
+    const sitemapPath = join(outDir, 'sitemap.xml');
+    writeFileSync(sitemapPath, sitemap.toString());
+    
+    console.log(`Sitemap gerado com sucesso em: ${sitemapPath}`);
+    return true;
   } catch (error) {
-    console.error('Erro ao gerar sitemap:', error);
+    console.error('Erro ao gerar sitemap:');
+    console.error(error);
     process.exit(1);
   }
 }
